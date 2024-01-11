@@ -1,0 +1,78 @@
+diff --git a/rhnsd.spec b/rhnsd.spec
+index d59e6e23ac..52642b3c1e 100644
+--- a/rhnsd.spec
++++ b/rhnsd.spec
+@@ -1,7 +1,7 @@
+ Summary: Spacewalk query daemon
+ Name: rhnsd
+ Version: 5.0.35
+-Release: 2%{?dist}
++Release: 3%{?dist}
+ License: GPLv2
+ Source0: https://github.com/spacewalkproject/spacewalk/archive/%{name}-%{version}.tar.gz
+ URL:     https://github.com/spacewalkproject/spacewalk
+@@ -9,7 +9,7 @@ URL:     https://github.com/spacewalkproject/spacewalk
+ BuildRequires: gettext
+ 
+ Requires: rhn-check >= 0.0.8
+-%if 0%{?suse_version} >= 1210 || 0%{?fedora}
++%if 0%{?suse_version} >= 1210 || 0%{?fedora} || 0%{?rhel} >= 7
+ BuildRequires: systemd
+ %{?systemd_requires}
+ %endif
+@@ -18,7 +18,7 @@ Requires(post): aaa_base
+ Requires(preun): aaa_base
+ BuildRequires: sysconfig
+ %else
+-%if 0%{?fedora}
++%if 0%{?fedora} || 0%{?rhel} >= 7
+ Requires(post): chkconfig
+ Requires(preun): chkconfig
+ Requires(post): systemd-sysv
+@@ -49,7 +49,7 @@ make -f Makefile.rhnsd install VERSION=%{version}-%{release} PREFIX=$RPM_BUILD_R
+ %if 0%{?suse_version} && 0%{?suse_version} < 1210
+ install -m 0755 rhnsd.init.SUSE $RPM_BUILD_ROOT/%{_initrddir}/rhnsd
+ %endif
+-%if 0%{?fedora} || 0%{?suse_version} >= 1210
++%if 0%{?fedora} || 0%{?suse_version} >= 1210 || 0%{?rhel} >= 7
+ rm $RPM_BUILD_ROOT/%{_initrddir}/rhnsd
+ mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
+ install -m 0644 rhnsd.service $RPM_BUILD_ROOT/%{_unitdir}/
+@@ -91,7 +91,7 @@ fi
+ %service_del_preun rhnsd.service
+ %else
+ if [ $1 = 0 ] ; then
+-    %if 0%{?fedora}
++    %if 0%{?fedora} || 0%{?rhel} >= 7
+         %systemd_preun rhnsd.service
+     %else
+     service rhnsd stop >/dev/null 2>&1
+@@ -107,7 +107,7 @@ fi
+ %service_del_postun rhnsd.service
+ %else
+ if [ "$1" -ge "1" ]; then
+-    %if 0%{?fedora}
++    %if 0%{?fedora} || 0%{?rhel} >= 7
+     %systemd_postun_with_restart rhnsd.service
+     %else
+     service rhnsd condrestart >/dev/null 2>&1 || :
+@@ -120,7 +120,7 @@ fi
+ %dir %{_sysconfdir}/sysconfig/rhn
+ %config(noreplace) %{_sysconfdir}/sysconfig/rhn/rhnsd
+ %{_sbindir}/rhnsd
+-%if 0%{?fedora} || 0%{?suse_version} >= 1210
++%if 0%{?fedora} || 0%{?suse_version} >= 1210 || 0%{?rhel} >= 7
+ %{_unitdir}/rhnsd.service
+ %else
+ %{_initrddir}/rhnsd
+@@ -129,6 +129,10 @@ fi
+ %doc LICENSE
+ 
+ %changelog
++* Fri Aug 10 2018 Tomas Kasparek <tkasparek@redhat.com> 5.0.35-3
++- Resolves: #1610286 - don't start as sysv service on systemd systems
++  (tkasparek@redhat.com)
++
+ * Mon Feb 19 2018 Tomas Kasparek <tkasparek@redhat.com> 5.0.35-2
+ - rebuild for rhel8 
+ 

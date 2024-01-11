@@ -1,0 +1,23 @@
+diff --git a/rhnsd.spec b/rhnsd.spec
+index 38e10c12c8..d59e6e23ac 100644
+--- a/rhnsd.spec
++++ b/rhnsd.spec
+@@ -1,7 +1,7 @@
+ Summary: Spacewalk query daemon
+ Name: rhnsd
+ Version: 5.0.35
+-Release: 1%{?dist}
++Release: 2%{?dist}
+ License: GPLv2
+ Source0: https://github.com/spacewalkproject/spacewalk/archive/%{name}-%{version}.tar.gz
+ URL:     https://github.com/spacewalkproject/spacewalk
+@@ -129,6 +129,9 @@ fi
+ %doc LICENSE
+ 
+ %changelog
++* Mon Feb 19 2018 Tomas Kasparek <tkasparek@redhat.com> 5.0.35-2
++- rebuild for rhel8 
++
+ * Mon Feb 05 2018 Tomas Kasparek <tkasparek@redhat.com> 5.0.35-1
+ - remove systemd-units
+ - remove obsoleted things from spec file
